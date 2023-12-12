@@ -1,0 +1,10 @@
+{
+  "base_config": {
+    "host": "127.0.0.1",
+    "port": "7860"
+  },
+  "api_key": {
+    "translate": "a3bd09635a44566b1adf7a0e53b29d51",
+    "gpt": "Oj3GOkZuTtXGT6tIMnjuDKpqufzZ8UK4"
+  }
+}

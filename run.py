@@ -10,7 +10,7 @@ if __name__ == '__main__':
         port = config['base_config']['port']
         gpt_key = config['api_key']['gpt']
 
-    instruction = "Make the mountain an apple."
+    instruction = "Turn the mountain into a dragon"
     image_path = "./input/inpainting.png"
 
     gpt = GPTDiscriminator(gpt_key)
@@ -21,3 +21,4 @@ if __name__ == '__main__':
 
     edit = EditImageGenerator(host=host, port=port)
     edit.gen_edit_image(predict_json['target_prompt'], image_path)
+

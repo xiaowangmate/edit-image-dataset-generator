@@ -16,17 +16,19 @@ class EditImageGenerator:
         print("\nedit image...")
         parameter = {
             "prompt": target_prompt,
-            "negative_prompt": "",
+            "negative_prompt": "nsfw, bad_quality",
             "seed": -1,
             "init_images": [
                 self.img2base64(image_path)
             ],
             "mask": self.img2base64("./output/mask/sam_mask1.png"),
-            "inpainting_fill": 0,
+            "inpainting_fill": 2,
             "width": "1024",
             "height": "1024",
-            "denoising_strength": 0.7,
-            "cfg_scale": 8
+            "denoising_strength": 0.8,
+            "cfg_scale": 10,
+            "steps": 28,
+            "sampler_index": "DPM++ 2M Karras",
         }
 
         response = requests.post(self.imi_url, data=json.dumps(parameter))
@@ -39,6 +41,6 @@ class EditImageGenerator:
 
 if __name__ == '__main__':
     edit = EditImageGenerator(host="127.0.0.1", port="7860")
-    image_path = "../input/inpainting.png"
+    image_path = "../input/586877.jpg"
     mask_path = "../input/mask.png"
-    edit.gen_edit_image("dragon", image_path)
+    edit.gen_edit_image("pocket", image_path)

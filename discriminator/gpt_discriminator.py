@@ -10,7 +10,7 @@ class GPTDiscriminator:
         openai.api_key = api_key
         self.gpt_model = "gpt-4"
         # self.gpt_model = "gpt-35-turbo"
-        self.respond_format_prompt = 'please respond json like this format: input: Turn the refrigerator into a bookshelf with books. output: { "mask_prompt": "refrigerator", "target_prompt": "a bookshelf with books"}'
+        self.respond_format_prompt = 'please give me the respond json such as input: Turn the refrigerator into a bookshelf with books. so the output like this format: { "mask_prompt": "refrigerator", "target_prompt": "a bookshelf with books"}'
 
     def get_completions(self, msg):
         completions = openai.ChatCompletion.create(

@@ -9,13 +9,19 @@ class SAMPredictor:
         self.sam_url = f"http://{host}:{port}/sam/sam-predict"
 
     def image2base64(self, image_path):
-        with open(image_path, "rb") as f:
-            return base64.b64encode(f.read()).decode()
+        with open(image_path, mode="rb") as r:
+            image_base64 = base64.b64encode(r.read()).decode("utf-8")
+            return image_base64
 
-    def gen_mask(self, original_image_path, mask_target):
+    def gen_mask(self, mask_target, original_image):
         print("\ngen mask...")
+        if type(original_image) == bytes:
+            input_image = base64.b64encode(original_image).decode()
+        else:
+            input_image = self.image2base64(original_image)
+
         payload = {
-            "input_image": self.image2base64(original_image_path),
+            "input_image": input_image,
             "dino_enabled": True,
             # "sam_positive_points": [[0, 0]],
             "dino_text_prompt": mask_target,
@@ -47,5 +53,11 @@ class SAMPredictor:
 
 if __name__ == '__main__':
     predictor = SAMPredictor(host="127.0.0.1", port="7860")
-    image_path = "../input/inpainting.png"
-    predictor.gen_mask(image_path, "tree")
+    import os
+    os.chdir('..')
+
+    image_path = "./input/586877.jpg"
+    # with open(image_path, mode="rb") as r:
+    #     image_base64 = r.read()
+
+    predictor.gen_mask("cup", image_path)

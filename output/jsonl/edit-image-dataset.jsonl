@@ -1,4 +1,6 @@
 {"source_image":  "output/images/test_image1.jpg", "target_image":  "output/images/edit_test_image1.jpg", "instruction":  "Turn the cup into a pocket"}
-{"source_image":  "output/images/test_image2.jpg", "target_image":  "output/images/edit_test_image2.jpg", "instruction":  "Turn the mountain into two chicken"}
 {"source_image":  "output/images/test_image1.jpg", "target_image":  "output/images/edit_test_image1_1.jpg", "instruction":  "change the cup to a red Starbucks cup"}
 {"source_image":  "output/images/test_image1.jpg", "target_image":  "output/images/edit_test_image1_2.jpg", "instruction":  "Turn the cup into a small bag"}
+{"source_image":  "output/images/test_image2.jpg", "target_image":  "output/images/edit_test_image2.jpg", "instruction":  "Turn the mountain into two chicken"}
+{"source_image":  "output/images/test_image2.jpg", "target_image":  "output/images/edit_test_image2_1.jpg", "instruction":  "Turn the mountain into a red house"}
+{"source_image":  "output/images/test_image2.jpg", "target_image":  "output/images/edit_test_image2_2.jpg", "instruction":  "Add a chicken in front of the mountain"}

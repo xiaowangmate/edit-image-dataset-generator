@@ -56,8 +56,8 @@ if __name__ == '__main__':
     import os
     os.chdir('..')
 
-    image_path = "./input/586877.jpg"
+    image_path = "./input/inpainting.png"
     # with open(image_path, mode="rb") as r:
     #     image_base64 = r.read()
 
-    predictor.gen_mask("cup", image_path)
+    predictor.gen_mask("mountain", image_path)

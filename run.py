@@ -52,12 +52,15 @@ def read_tar(tar_path):
                                 instruction = gpt.gen_instruction(caption)
                                 predict_json = gpt.gen_predict_json(instruction)
                                 predictor.gen_mask(predict_json['mask_prompt'], image)
-                                source_image_path, target_image_path = edit.gen_edit_image(task_type, predict_json['target_prompt'], image, image_name)
+                                source_image_path, target_image_path = edit.gen_edit_image(task_type, predict_json[
+                                    'target_prompt'], image, image_name)
                             else:
                                 instruction = random.choice(change_style_instructions)
-                                source_image_path, target_image_path = edit.gen_edit_image(task_type, instruction, image, image_name)
+                                source_image_path, target_image_path = edit.gen_edit_image(task_type, instruction,
+                                                                                           image, image_name)
 
-                            json_line = {"source_image": source_image_path, "target_image": target_image_path, "instruction": instruction}
+                            json_line = {"source_image": source_image_path, "target_image": target_image_path,
+                                         "instruction": instruction}
                             append2jsonl(json_line, output_jsonl_folder_path="C:/output")
             except Exception as e:
                 print(f"error: {member.name}, {str(e)}")
@@ -77,7 +80,8 @@ def gen_edit_image(instruction, image, image_name):
     predict_json = gpt.gen_predict_json(instruction)
     predictor.gen_mask(predict_json['mask_prompt'], image)
     task_type = "replace_object"
-    source_image_path, target_image_path = edit.gen_edit_image(task_type, predict_json['target_prompt'], image, image_name)
+    source_image_path, target_image_path = edit.gen_edit_image(task_type, predict_json['target_prompt'], image,
+                                                               image_name)
 
 
 def read_local_instructions():
@@ -89,6 +93,12 @@ def read_local_instructions():
 def append2jsonl(json_line, output_jsonl_folder_path="output/jsonl"):
     with open(f"{output_jsonl_folder_path}/edit-image-dataset.jsonl", mode="a+", encoding="utf-8") as a:
         a.write(f"{json_line}\n")
+
+
+# def test():
+#     predictor.gen_mask("target", image_bytes)
+#     source_image_path, target_image_path = edit.gen_edit_image("replace_object", "a cat", image_bytes,
+#                                                                "111.jpg")
 
 
 if __name__ == '__main__':

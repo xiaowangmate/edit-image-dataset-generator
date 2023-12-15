@@ -16,7 +16,7 @@ class SAMPredictor:
         if model_list:
             return model_list[0]
         else:
-            raise "please download a sam model."
+            raise "not found model, please download a sam model."
 
     def image2base64(self, image_path):
         with open(image_path, mode="rb") as r:
@@ -67,8 +67,8 @@ if __name__ == '__main__':
     import os
     os.chdir('..')
 
-    image_path = "./input/inpainting.png"
+    image_path = "./input/R.jpg"
     # with open(image_path, mode="rb") as r:
     #     image_base64 = r.read()
 
-    predictor.gen_mask("mountain", image_path)
+    predictor.gen_mask("puppy", image_path)

@@ -1,3 +1,4 @@
+import json
 import base64
 import requests
 from PIL import Image
@@ -7,6 +8,15 @@ from io import BytesIO
 class SAMPredictor:
     def __init__(self, host, port):
         self.sam_url = f"http://{host}:{port}/sam/sam-predict"
+        self.sam_model = self.get_sam_model_name()
+
+    def get_sam_model_name(self):
+        response = requests.get(self.sam_url.replace("predict", "model"))
+        model_list = json.loads(response.content)
+        if model_list:
+            return model_list[0]
+        else:
+            raise "please download a sam model."
 
     def image2base64(self, image_path):
         with open(image_path, mode="rb") as r:
@@ -21,6 +31,7 @@ class SAMPredictor:
             input_image = self.image2base64(original_image)
 
         payload = {
+            "sam_model_name": self.sam_model,
             "input_image": input_image,
             "dino_enabled": True,
             # "sam_positive_points": [[0, 0]],

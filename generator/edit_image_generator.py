@@ -12,10 +12,11 @@ class EditImageGenerator:
         self.output_folder_path = output_folder_path
         self.task_type_list = ["replace_object", "replace_background", "change_color",
                                "change_style", "remove_object", "add_object"]
+        self.controlnet_model_list_url = f"http://{host}:{port}/controlnet/model_list?update=true"
         self.depth_model_name = self.get_controlnet_model_name("depth")
 
     def get_controlnet_model_name(self, module_name):
-        model_list = json.loads(requests.get("http://127.0.0.1:7860/controlnet/model_list?update=true").content)['model_list']
+        model_list = json.loads(requests.get(self.controlnet_model_list_url).content)['model_list']
         if model_list:
             for model in model_list:
                 if module_name in model:
@@ -59,7 +60,7 @@ class EditImageGenerator:
         parameter["init_images"] = [init_images]
 
         response = requests.post(self.imi_url, data=json.dumps(parameter))
-        print(response.content)
+        # print(response.content)
         image_type = original_image_name.split(".")[-1]
         output_image_name = original_image_name.replace(f".{image_type}", "_edit.jpg")
         target_image_path = f"{self.output_folder_path}/{output_image_name}"
@@ -103,7 +104,7 @@ class EditImageGenerator:
             "negative_prompt": "nsfw,bad_quality,broken,cartoon,anime,manga,comic",
             "seed": -1,
             "mask": self.image2base64("./output/mask/sam_mask1.png"),
-            "inpainting_mask_invert": 0,
+            "inpainting_mask_invert": 1,
             "inpainting_fill": 1,
             "denoising_strength": 0.8,
             "cfg_scale": 10,
@@ -115,7 +116,8 @@ class EditImageGenerator:
                         {
                             "input_image": init_images,
                             "module": "depth",
-                            "model": self.depth_model_name
+                            "model": self.depth_model_name,
+                            "pixel_perfect": True
                         }
                     ]
                 }
@@ -180,8 +182,6 @@ class EditImageGenerator:
 
 if __name__ == '__main__':
     edit = EditImageGenerator(host="127.0.0.1", port="7860", output_folder_path="./output")
-    import os
-
     os.chdir('..')
 
     image_path = "./input/R.jpg"

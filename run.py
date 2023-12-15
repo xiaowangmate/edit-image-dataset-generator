@@ -13,9 +13,9 @@ with open("configs/config.json", mode="r", encoding="utf-8") as r:
     config = json.loads(r.read())
     host = config['base_config']['host']
     port = config['base_config']['port']
+    input_tar_folder_path = config['io_config']['input_tar_folder_path']
+    output_image_folder_path = config['io_config']['output_image_folder_path']
     gpt_key = config['api_key']['gpt']
-
-output_image_folder_path = "C:/output/image"
 
 gpt = GPTDiscriminator(gpt_key)
 predictor = SAMPredictor(host=host, port=port)
@@ -76,14 +76,6 @@ def pixels_meeting(img_obj):
     return pixels_meeting_value
 
 
-def gen_edit_image(instruction, image, image_name):
-    predict_json = gpt.gen_predict_json(instruction)
-    predictor.gen_mask(predict_json['mask_prompt'], image)
-    task_type = "replace_object"
-    source_image_path, target_image_path = edit.gen_edit_image(task_type, predict_json['target_prompt'], image,
-                                                               image_name)
-
-
 def read_local_instructions():
     with open("discriminator/instructions/change_style.txt", mode="r", encoding="utf-8") as r:
         change_style_instructions = r.read().split("\n")
@@ -95,14 +87,8 @@ def append2jsonl(json_line, output_jsonl_folder_path="output/jsonl"):
         a.write(f"{json_line}\n")
 
 
-# def test():
-#     predictor.gen_mask("target", image_bytes)
-#     source_image_path, target_image_path = edit.gen_edit_image("replace_object", "a cat", image_bytes,
-#                                                                "111.jpg")
-
-
 if __name__ == '__main__':
     # image_path = "./input/inpainting.png"
     # instruction = "Turn the mountain into a dragon"
     # gen_edit_image(image_path, instruction)
-    find_all_tar(r"C:\unsplash")
+    find_all_tar(input_tar_folder_path)

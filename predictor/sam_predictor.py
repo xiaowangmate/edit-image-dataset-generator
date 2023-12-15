@@ -1,3 +1,4 @@
+import os
 import json
 import base64
 import requests
@@ -64,7 +65,6 @@ class SAMPredictor:
 
 if __name__ == '__main__':
     predictor = SAMPredictor(host="127.0.0.1", port="7860")
-    import os
     os.chdir('..')
 
     image_path = "./input/R.jpg"

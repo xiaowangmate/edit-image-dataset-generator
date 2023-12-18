@@ -1,0 +1,8 @@
+{"source_image":  "input/test_images/1.jpg", "task_type":  "replace_object", "mask_object":  "pillar", "edit_content":  "person"}
+{"source_image":  "input/test_images/2.jpg", "task_type":  "replace_object", "mask_object":  "gun", "edit_content":  "camera"}
+{"source_image":  "input/test_images/3.jpg", "task_type":  "replace_object", "mask_object":  "airpods", "edit_content":  "a big earphone in blue background"}
+{"source_image":  "input/test_images/4.jpg", "task_type":  "replace_object", "mask_object":  "buoy", "edit_content":  "whale"}
+{"source_image":  "input/test_images/5.jpg", "task_type":  "replace_object", "mask_object":  "plate with donuts", "edit_content":  "plate with cake"}
+{"source_image":  "input/test_images/6.jpg", "task_type":  "replace_object", "mask_object":  "guitar", "edit_content":  "banana"}
+{"source_image":  "input/test_images/7.jpg", "task_type":  "replace_object", "mask_object":  "rainbow umbrella", "edit_content":  "blue tarp"}
+{"source_image":  "input/test_images/8.jpg", "task_type":  "replace_object", "mask_object":  "gun", "edit_content":  "a small water bottle"}

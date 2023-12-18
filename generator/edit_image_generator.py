@@ -10,6 +10,7 @@ class EditImageGenerator:
     def __init__(self, host, port, output_folder_path="./output/images"):
         self.imi_url = f"http://{host}:{port}/sdapi/v1/img2img"
         self.output_folder_path = output_folder_path
+        self.mask_save_path = f"./output/mask/sam_mask.png"
         self.task_type_list = ["replace_object", "replace_background", "change_color",
                                "change_style", "remove_object", "add_object"]
         self.controlnet_model_list_url = f"http://{host}:{port}/controlnet/model_list?update=true"
@@ -74,7 +75,7 @@ class EditImageGenerator:
             "prompt": target_prompt + ",real, photograph",
             "negative_prompt": "nsfw, bad_quality, broken",
             "seed": -1,
-            "mask": self.image2base64("./output/mask/sam_mask1.png"),
+            "mask": self.image2base64(self.mask_save_path),
             "inpainting_fill": 3,
             "denoising_strength": 0.5,
             "cfg_scale": 6,
@@ -88,8 +89,7 @@ class EditImageGenerator:
             "prompt": target_prompt + ",real, photograph",
             "negative_prompt": "nsfw, bad_quality, broken",
             "seed": -1,
-            "mask": self.image2base64("./output/mask/sam_mask1.png"),
-            # "inpainting_mask_invert": 1,
+            "mask": self.image2base64(self.mask_save_path),
             "inpainting_fill": 2,
             "denoising_strength": 0.8,
             "cfg_scale": 10,
@@ -103,7 +103,7 @@ class EditImageGenerator:
             "prompt": target_prompt,
             "negative_prompt": "nsfw,bad_quality,broken,cartoon,anime,manga,comic",
             "seed": -1,
-            "mask": self.image2base64("./output/mask/sam_mask1.png"),
+            "mask": self.image2base64(self.mask_save_path),
             "inpainting_mask_invert": 1,
             "inpainting_fill": 1,
             "denoising_strength": 0.8,
@@ -130,7 +130,7 @@ class EditImageGenerator:
             "prompt": target_prompt,
             "negative_prompt": "nsfw, bad_quality",
             "seed": -1,
-            "mask": self.image2base64("./output/mask/sam_mask1.png"),
+            "mask": self.image2base64(self.mask_save_path),
             "inpainting_fill": 2,
             "denoising_strength": 0.8,
             "cfg_scale": 10,
@@ -156,7 +156,7 @@ class EditImageGenerator:
             "prompt": target_prompt,
             "negative_prompt": "nsfw, bad_quality",
             "seed": -1,
-            "mask": self.image2base64("./output/mask/sam_mask1.png"),
+            "mask": self.image2base64(self.mask_save_path),
             "inpainting_fill": 2,
             "denoising_strength": 1,
             "cfg_scale": 10,
@@ -170,7 +170,7 @@ class EditImageGenerator:
             "prompt": target_prompt,
             "negative_prompt": "nsfw, bad_quality",
             "seed": -1,
-            "mask": self.image2base64("./output/mask/sam_mask1.png"),
+            "mask": self.image2base64(self.mask_save_path),
             "inpainting_fill": 2,
             "denoising_strength": 1,
             "cfg_scale": 10,

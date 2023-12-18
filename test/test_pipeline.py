@@ -1,6 +1,6 @@
+import glob
 import os
 import json
-import base64
 from PIL import Image
 from io import BytesIO
 from discriminator.gpt_discriminator import GPTDiscriminator
@@ -36,8 +36,12 @@ def test(task_type, mask_object, edit_content, input_image_path):
         img = Image.open(BytesIO(image_file))
 
         if pixels_meeting(img):
-            input_image_name = input_image_path.split("/")[-1]
-            predictor.gen_mask(mask_object, image_file)
+
+            if "\\" in input_image_path:
+                input_image_name = input_image_path.split("\\")[-1]
+            else:
+                input_image_name = input_image_path.split("/")[-1]
+            predictor.gen_mask(mask_object, image_file, 13)
             source_image_path, target_image_path = edit.gen_edit_image(task_type, edit_content,
                                                                        image_file, input_image_name)
             print(f"task completed-\nsource_image_path: {source_image_path}\ntarget_image_path: {target_image_path}")
@@ -45,11 +49,30 @@ def test(task_type, mask_object, edit_content, input_image_path):
             print("image pixels not meeting.")
 
 
+def batch_test_img(test_mapping_path):
+    with open(test_mapping_path, mode="r", encoding="utf-8") as mp:
+        json_lines = mp.readlines()
+        for index, json_line in enumerate(json_lines):
+            json_line = json.loads(json_line)
+
+            input_image_path = json_line['source_image']
+
+            if index + 1 in [8]:
+                task_type = json_line['task_type']
+                mask_object = json_line['mask_object']
+                edit_content = json_line['edit_content']
+
+                test(task_type, mask_object, edit_content, input_image_path)
+
+
 if __name__ == '__main__':
-    input_image_path = "input/R.jpg"
+    batch_test_img("output/jsonl/test_mapping.jsonl")
 
-    task_type = "replace_object"
-    mask_object = "puppy"  # if it is change_style, you can fill in the blanks
-    edit_content = "cat"
 
-    test(task_type, mask_object, edit_content, input_image_path)
+    # input_image_path = "input/2bfe8b36806940d2863841fddf7db67a.jpg"
+    #
+    # task_type = "replace_object"
+    # mask_object = "gun"  # if it is change_style, you can fill in the blanks
+    # edit_content = "water bottle"
+    #
+    # test(task_type, mask_object, edit_content, input_image_path)

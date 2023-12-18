@@ -9,10 +9,14 @@ from io import BytesIO
 class SAMPredictor:
     def __init__(self, host, port):
         self.sam_url = f"http://{host}:{port}/sam/sam-predict"
+        self.sam_model_url = f"http://{host}:{port}/sam/sam-model"
+        self.sam_expand_url = f"http://{host}:{port}/sam/dilate-mask"
+        self.mask_save_path = f"./output/mask/sam_mask.png"
+        self.preview_grid = Image.new('RGBA', (3 * 512, 3 * 512))
         self.sam_model = self.get_sam_model_name()
 
     def get_sam_model_name(self):
-        response = requests.get(self.sam_url.replace("predict", "model"))
+        response = requests.get(self.sam_model_url)
         model_list = json.loads(response.content)
         if model_list:
             return model_list[0]
@@ -24,7 +28,7 @@ class SAMPredictor:
             image_base64 = base64.b64encode(r.read()).decode("utf-8")
             return image_base64
 
-    def gen_mask(self, mask_target, original_image):
+    def gen_mask(self, mask_target, original_image, dilate_amount=0):
         print("\ngen mask...")
         if type(original_image) == bytes:
             input_image = base64.b64encode(original_image).decode()
@@ -35,32 +39,52 @@ class SAMPredictor:
             "sam_model_name": self.sam_model,
             "input_image": input_image,
             "dino_enabled": True,
-            # "sam_positive_points": [[0, 0]],
             "dino_text_prompt": mask_target,
             "dino_preview_checkbox": False,
         }
         response = requests.post(self.sam_url, json=payload)
         reply = response.json()
 
-        # print(reply)
-        print(f"segment info: {reply['msg']}")
+        # print(reply, reply.keys())
+        if 'errors' in reply.keys():
+            print(f"segment error: {reply['errors']}")
+            raise reply['errors']
+        else:
+            print(f"segment info: {reply['msg']}")
 
-        grid = Image.new('RGBA', (3 * 512, 3 * 512))
-        self.paste(reply["masks"], 1, grid)
-        self.paste(reply["masked_images"], 2, grid)
+            mask = reply["masks"][0]
 
-    def paste(self, images, row, grid):
+            if dilate_amount == 0:
+                self.write_mask(mask)
+            else:
+                self.expand_mask(input_image, mask, dilate_amount)
+
+    def reset_preview_grid(self):
+        self.preview_grid = Image.new('RGBA', (3 * 512, 3 * 512))
+
+    def preview_mask(self, images, row):
         for idx, img in enumerate(images):
             img_pil = Image.open(BytesIO(base64.b64decode(img))).resize((512, 512))
-            grid.paste(img_pil, (idx * 512, row * 512))
+            self.preview_grid.paste(img_pil, (idx * 512, row * 512))
+            self.preview_grid.show()
 
-            # grid.show()
-            # img_pil.save("output/sam_predict.png")
+    def expand_mask(self, input_image, mask, dilate_amount):
+        payload = {
+            "input_image": input_image,
+            "mask": mask,
+            "dilate_amount": dilate_amount
+        }
+        response = requests.post(self.sam_expand_url, json=payload)
+        reply = response.json()
+        # print(reply, reply.keys())
 
-            if idx == 1 and (row == 1 or row == 2):
-                file = open(f"./output/mask/sam_mask{row}.png", "wb")
-                file.write(base64.b64decode(img))
-                file.close()
+        self.write_mask(reply["mask"])
+        print("expand mask successful.")
+
+    def write_mask(self, mask):
+        file = open(self.mask_save_path, "wb")
+        file.write(base64.b64decode(mask))
+        file.close()
 
 
 if __name__ == '__main__':
@@ -71,4 +95,4 @@ if __name__ == '__main__':
     # with open(image_path, mode="rb") as r:
     #     image_base64 = r.read()
 
-    predictor.gen_mask("puppy", image_path)
+    predictor.gen_mask("puppy", image_path, 0)

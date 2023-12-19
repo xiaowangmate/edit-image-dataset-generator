@@ -68,7 +68,6 @@ def batch_test_img(test_mapping_path):
 if __name__ == '__main__':
     batch_test_img("output/jsonl/test_mapping.jsonl")
 
-
     # input_image_path = "input/2bfe8b36806940d2863841fddf7db67a.jpg"
     #
     # task_type = "replace_object"

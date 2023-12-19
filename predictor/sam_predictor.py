@@ -47,7 +47,7 @@ class SAMPredictor:
 
         # print(reply, reply.keys())
         if 'errors' in reply.keys():
-            print(f"segment error: {reply['errors']}")
+            print(f"segment error: {reply}")
             raise reply['errors']
         else:
             print(f"segment info: {reply['msg']}")

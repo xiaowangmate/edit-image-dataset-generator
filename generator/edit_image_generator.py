@@ -31,7 +31,7 @@ class EditImageGenerator:
             image_base64 = base64.b64encode(r.read()).decode("utf-8")
             return image_base64
 
-    def gen_edit_image(self, task_type, target_prompt, original_image, original_image_name):
+    def gen_edit_image(self, task_type, target_prompt, original_image, original_image_name, output_image_name=None):
         print("\nedit image...")
         if type(original_image) == bytes:
             init_images = base64.b64encode(original_image).decode("utf-8")
@@ -63,8 +63,9 @@ class EditImageGenerator:
 
         response = requests.post(self.imi_url, data=json.dumps(parameter))
         # print(response.content)
-        image_type = original_image_name.split(".")[-1]
-        output_image_name = original_image_name.replace(f".{image_type}", "_edit.jpg")
+        if not output_image_name:
+            image_type = original_image_name.split(".")[-1]
+            output_image_name = original_image_name.replace(f".{image_type}", "_edit.jpg")
         target_image_path = f"{self.output_folder_path}/{output_image_name}"
         with open(target_image_path, mode="wb") as w:
             w.write(base64.b64decode(response.json()['images'][0]))

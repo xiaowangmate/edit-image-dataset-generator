@@ -4,8 +4,9 @@
     "port": "7860"
   },
   "io_config": {
-    "input_tar_folder_path": "C:/unsplash",
-    "output_image_folder_path": "./output"
+    "input_tar_folder_path": "intput/images_tar",
+    "output_image_folder_path": "output/images",
+    "output_jsonl_folder_path": "output/jsonl"
   },
   "api_key": {
     "translate": "a3bd09635a44566b1adf7a0e53b29d51",

@@ -15,6 +15,7 @@ with open("configs/config.json", mode="r", encoding="utf-8") as r:
     port = config['base_config']['port']
     input_tar_folder_path = config['io_config']['input_tar_folder_path']
     output_image_folder_path = config['io_config']['output_image_folder_path']
+    output_jsonl_folder_path = config['io_config']['output_jsonl_folder_path']
     gpt_key = config['api_key']['gpt']
 
 gpt = GPTDiscriminator(gpt_key)
@@ -22,7 +23,7 @@ predictor = SAMPredictor(host=host, port=port)
 edit = EditImageGenerator(host=host, port=port, output_folder_path=output_image_folder_path)
 
 
-def find_all_tar(tar_base_path):
+def process_all_tar(tar_base_path):
     for folder, sub_folders, files in os.walk(tar_base_path):
         for tar_path in glob.glob(os.path.join(folder, "*.tar")):
             read_tar(tar_path)
@@ -61,7 +62,7 @@ def read_tar(tar_path):
 
                             json_line = {"source_image": source_image_path, "target_image": target_image_path,
                                          "instruction": instruction}
-                            append2jsonl(json_line, output_jsonl_folder_path="C:/output")
+                            append2jsonl(json_line)
             except Exception as e:
                 print(f"error: {member.name}, {str(e)}")
 
@@ -82,7 +83,7 @@ def read_local_instructions():
         return change_style_instructions
 
 
-def append2jsonl(json_line, output_jsonl_folder_path="output/jsonl"):
+def append2jsonl(json_line):
     with open(f"{output_jsonl_folder_path}/edit-image-dataset.jsonl", mode="a+", encoding="utf-8") as a:
         a.write(f"{json_line}\n")
 
@@ -91,4 +92,4 @@ if __name__ == '__main__':
     # image_path = "./input/inpainting.png"
     # instruction = "Turn the mountain into a dragon"
     # gen_edit_image(image_path, instruction)
-    find_all_tar(input_tar_folder_path)
+    process_all_tar(input_tar_folder_path)

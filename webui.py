@@ -22,7 +22,7 @@ def image2base64(image_path):
 
 def mask_preview(image, mask_prompt, expand):
     predictor.gen_mask(mask_prompt, image, expand)
-    return "output/mask/sam_mask.png"
+    return ["output/mask/sam_mask.png"]
 
 
 def gen_edit_image(image, task, edit_prompt):
@@ -30,9 +30,9 @@ def gen_edit_image(image, task, edit_prompt):
         input_image_name = image.split("\\")[-1]
     else:
         input_image_name = image.split("/")[-1]
-    source_image_path, target_image_path = edit.gen_edit_image(task, edit_prompt,
+    source_image_path, target_image_path = edit.gen_edit_image(task.replace(" ", "_"), edit_prompt,
                                                                image, input_image_name)
-    return target_image_path
+    return [target_image_path]
 
 
 def oneclick_generation(image, mask_prompt, expand, task, edit_prompt):
@@ -43,7 +43,7 @@ def oneclick_generation(image, mask_prompt, expand, task, edit_prompt):
         input_image_name = image.split("/")[-1]
     source_image_path, target_image_path = edit.gen_edit_image(task, edit_prompt,
                                                                image, input_image_name)
-    return "output/mask/sam_mask.png", target_image_path
+    return [target_image_path, "output/mask/sam_mask.png"]
 
 
 def start_ui():
@@ -61,27 +61,25 @@ def start_ui():
                         label="expand value",
                         value=0
                     )
-                gen_mask_button = gr.Button(value="mask generation")
-                mask_output = gr.Image(
-                    label="mask preview",
-                    type="filepath"
-                )
+                gen_mask_button = gr.Button(value="mask preview")
                 with gr.Row():
                     task_type = gr.Dropdown(
                         label="task type",
                         choices=[
-                            "replace_object",
-                            "replace_background",
-                            "change_style"
+                            "replace object",
+                            "replace background",
+                            "change style"
                         ],
-                        value="replace_object"
+                        value="replace object"
                     )
                     edit_content = gr.Text(label="edit content")
                     gen_edit_image_button = gr.Button(value="edit image generation")
             with gr.Row():
-                edit_image_output = gr.Image(
+                edit_image_output = gr.Gallery(
                     label="edit image",
-                    type="filepath"
+                    allow_preview=True,
+                    preview=True,
+                    selected_index=0
                 )
 
         one_click_generate_button = gr.Button(
@@ -97,7 +95,7 @@ def start_ui():
                 expand_value
             ],
             outputs=[
-                mask_output
+                edit_image_output
             ]
         )
 
@@ -123,7 +121,6 @@ def start_ui():
                 edit_content
             ],
             outputs=[
-                mask_output,
                 edit_image_output
             ]
         )

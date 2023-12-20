@@ -87,12 +87,21 @@ class SAMPredictor:
         file.close()
 
 
-if __name__ == '__main__':
-    predictor = SAMPredictor(host="127.0.0.1", port="7860")
+def test(input_path, mask_target, dilate_amount):
     os.chdir('..')
+    with open("configs/config.json", mode="r", encoding="utf-8") as r:
+        config = json.loads(r.read())
+        host = config['base_config']['host']
+        port = config['base_config']['port']
 
-    image_path = "./input/R.jpg"
-    # with open(image_path, mode="rb") as r:
-    #     image_base64 = r.read()
+    predictor = SAMPredictor(host=host, port=port)
+    predictor.gen_mask(mask_target, input_path, dilate_amount)
 
-    predictor.gen_mask("puppy", image_path, 0)
+
+if __name__ == '__main__':
+    input_path = "./input/R.jpg"
+
+    dilate_amount = 0
+    mask_target = "puppy"
+
+    test(input_path, mask_target, dilate_amount)

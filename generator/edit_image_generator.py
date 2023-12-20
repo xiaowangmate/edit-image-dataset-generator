@@ -15,6 +15,7 @@ class EditImageGenerator:
                                "change_style", "remove_object", "add_object"]
         self.controlnet_model_list_url = f"http://{host}:{port}/controlnet/model_list?update=true"
         self.depth_model_name = self.get_controlnet_model_name("depth")
+        self.canny_model_name = self.get_controlnet_model_name("canny")
 
     def get_controlnet_model_name(self, module_name):
         model_list = json.loads(requests.get(self.controlnet_model_list_url).content)['model_list']
@@ -52,7 +53,7 @@ class EditImageGenerator:
         elif task_type == "replace_background":
             parameter = self.task_replace_background(target_prompt, init_images)
         elif task_type == "change_style":
-            parameter = self.task_change_style(target_prompt)
+            parameter = self.task_change_style(target_prompt, init_images)
         else:
             parameter = self.task_replace_object(target_prompt)
 
@@ -139,15 +140,27 @@ class EditImageGenerator:
         }
         return parameter
 
-    def task_change_style(self, target_prompt):
+    def task_change_style(self, target_prompt, init_images):
         parameter = {
             "prompt": target_prompt,
             "negative_prompt": "nsfw, bad_quality",
             "seed": -1,
-            "denoising_strength": 0.5,
+            "denoising_strength": 1,
             "cfg_scale": 10,
-            "steps": 28,
+            "steps": 48,
             "sampler_index": "DPM++ 2M Karras",
+            "alwayson_scripts": {
+                "controlnet": {
+                    "args": [
+                        {
+                            "input_image": init_images,
+                            "module": "depth",
+                            "model": self.depth_model_name,
+                            "pixel_perfect": True
+                        }
+                    ]
+                }
+            }
         }
         return parameter
 
@@ -180,13 +193,23 @@ class EditImageGenerator:
         return parameter
 
 
-if __name__ == '__main__':
-    edit = EditImageGenerator(host="127.0.0.1", port="7860", output_folder_path="./output")
+def test(input_path, output_path, edit_type, edit_content):
+    image_name = input_path.split("/")[-1]
     os.chdir('..')
+    with open("configs/config.json", mode="r", encoding="utf-8") as r:
+        config = json.loads(r.read())
+        host = config['base_config']['host']
+        port = config['base_config']['port']
 
-    image_path = "./input/R.jpg"
-    image_name = image_path.split("/")[-1]
-    # with open(image_path, mode="rb") as r:
-    #     image_base64 = r.read()
+    edit = EditImageGenerator(host=host, port=port, output_folder_path=output_path)
+    edit.gen_edit_image(edit_type, edit_content, input_path, image_name)
 
-    edit.gen_edit_image("replace_background", "a river", image_path, image_name)
+
+if __name__ == '__main__':
+    input_path = "./input/R.jpg"
+    output_path = "./output"
+
+    edit_type = "replace_background"  # edit_type: "replace_object", "replace_background", "change_style"
+    edit_content = "a river"
+
+    test(input_path, output_path, edit_type, edit_content)

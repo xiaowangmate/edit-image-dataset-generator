@@ -30,25 +30,32 @@ def gen_edit_image(image, task, edit_prompt):
         input_image_name = image.split("\\")[-1]
     else:
         input_image_name = image.split("/")[-1]
-    source_image_path, target_image_path = edit.gen_edit_image(task.replace(" ", "_"), edit_prompt,
+    source_image_path, target_image_path = edit.gen_edit_image(task, edit_prompt,
                                                                image, input_image_name)
     return [target_image_path]
 
 
 def oneclick_generation(image, mask_prompt, expand, task, edit_prompt):
-    predictor.gen_mask(mask_prompt, image, expand)
     if "\\" in image:
         input_image_name = image.split("\\")[-1]
     else:
         input_image_name = image.split("/")[-1]
-    source_image_path, target_image_path = edit.gen_edit_image(task, edit_prompt,
-                                                               image, input_image_name)
-    return [target_image_path, "output/mask/sam_mask.png"]
+
+    if task == "change_style":
+        edit_prompt = ",".join([mask_prompt, edit_prompt])
+        source_image_path, target_image_path = edit.gen_edit_image(task, edit_prompt,
+                                                                   image, input_image_name)
+        return [target_image_path]
+    else:
+        predictor.gen_mask(mask_prompt, image, expand)
+        source_image_path, target_image_path = edit.gen_edit_image(task, edit_prompt,
+                                                                   image, input_image_name)
+        return [target_image_path, "output/mask/sam_mask.png"]
 
 
 def start_ui():
-    with gr.Blocks(title="编辑图像生成器") as edit_image_dataset_generator:
-        gr.HTML("<h1 style='text-align:center;'>编辑图像生成器</h1>")
+    with gr.Blocks(title="Image Editor") as edit_image_dataset_generator:
+        gr.HTML("<h1 style='text-align:center;'>Image Editor</h1>")
         with gr.Row():
             with gr.Column():
                 image_input = gr.Image(
@@ -56,21 +63,21 @@ def start_ui():
                     type="filepath"
                 )
                 with gr.Row():
-                    mask_object = gr.Text(label="mask object")
                     expand_value = gr.Slider(
                         label="expand value",
                         value=0
                     )
+                    mask_target = gr.Text(label="mask target")
                 gen_mask_button = gr.Button(value="mask preview")
                 with gr.Row():
                     task_type = gr.Dropdown(
-                        label="task type",
+                        label="edit type",
                         choices=[
-                            "replace object",
-                            "replace background",
-                            "change style"
+                            "replace_background",
+                            "change_style",
+                            "replace_object"
                         ],
-                        value="replace object"
+                        value="replace_background"
                     )
                     edit_content = gr.Text(label="edit content")
                     gen_edit_image_button = gr.Button(value="edit image generation")
@@ -91,7 +98,7 @@ def start_ui():
             fn=mask_preview,
             inputs=[
                 image_input,
-                mask_object,
+                mask_target,
                 expand_value
             ],
             outputs=[
@@ -115,7 +122,7 @@ def start_ui():
             fn=oneclick_generation,
             inputs=[
                 image_input,
-                mask_object,
+                mask_target,
                 expand_value,
                 task_type,
                 edit_content
@@ -125,8 +132,9 @@ def start_ui():
             ]
         )
 
-    edit_image_dataset_generator.launch(share=True)
+    edit_image_dataset_generator.launch(server_name="0.0.0.0", server_port=7890)
 
 
 if __name__ == '__main__':
     start_ui()
+

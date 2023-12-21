@@ -4,7 +4,7 @@
     "port": "7860"
   },
   "io_config": {
-    "input_tar_folder_path": "intput/images_tar",
+    "input_tar_folder_path": "input/images_tar",
     "output_image_folder_path": "output/images",
     "output_jsonl_folder_path": "output/jsonl"
   },

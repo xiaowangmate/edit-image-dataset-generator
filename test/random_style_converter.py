@@ -20,7 +20,7 @@ edit = EditImageGenerator(host=host, port=port, output_folder_path=output_image_
 
 
 class StyleConverter:
-    def __init__(self, input_image_tar_folder_path):
+    def __init__(self):
         self.total_styles = [
             'Cartoon style',
             'Van Gogh style',
@@ -66,10 +66,9 @@ class StyleConverter:
             'Ghibli Studio style',
             'Pixar style',
         ]
-        self.input_image_tar_folder_path = input_image_tar_folder_path
 
-    def process_all_tar(self):
-        for folder, sub_folders, files in os.walk(self.input_image_tar_folder_path):
+    def process_all_tar(self, input_tar_folder_path):
+        for folder, sub_folders, files in os.walk(input_tar_folder_path):
             for tar_path in glob.glob(os.path.join(folder, "*.tar")):
                 self.read_tar(tar_path)
 
@@ -90,7 +89,7 @@ class StyleConverter:
                         edit_prompt = ",".join([caption, convert_style])
                         image_type = image_name.split(".")[-1]
                         convert_image_name = image_name.replace(f".{image_type}",
-                                                                f"_{image_type.replace(' ', '_')}.jpg")
+                                                                f"_{convert_style.replace(' ', '_')}.jpg")
                         source_image_path, target_image_path = edit.gen_edit_image("change_style", edit_prompt,
                                                                                    image, image_name,
                                                                                    convert_image_name)
@@ -105,5 +104,5 @@ class StyleConverter:
 
 
 if __name__ == '__main__':
-    sc = StyleConverter(input_tar_folder_path)
-    sc.process_all_tar()
+    sc = StyleConverter()
+    sc.process_all_tar(input_tar_folder_path)

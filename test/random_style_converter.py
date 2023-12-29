@@ -77,26 +77,31 @@ class StyleConverter:
             members = tar.getmembers()
 
             for member in members:
-                img_f = tar.extractfile(member)
+                try:
+                    img_f = tar.extractfile(member)
 
-                if ".jpg" in member.name:
-                    if not os.path.exists(f"{output_image_folder_path}/{member.name}"):
+                    if ".jpg" in member.name:
                         image = img_f.read()
                         image_name = member.name
-                        txt_f = tar.extractfile(image_name.replace('.jpg', '.txt'))
-                        caption = txt_f.read().decode("utf-8")
-                        convert_style = random.choice(self.total_styles)
-                        edit_prompt = ",".join([caption, convert_style])
-                        image_type = image_name.split(".")[-1]
-                        convert_image_name = image_name.replace(f".{image_type}",
-                                                                f"_{convert_style.replace(' ', '_')}.jpg")
-                        source_image_path, target_image_path = edit.gen_edit_image("change_style", edit_prompt,
-                                                                                   image, image_name,
-                                                                                   convert_image_name)
 
-                        json_line = {"source_image": source_image_path, "target_image": target_image_path,
-                                     "style": convert_style}
-                        self.append2jsonl(json_line)
+                        image_type = image_name.split(".")[-1]
+                        convert_style = random.choice(self.total_styles)
+                        convert_image_name = image_name.replace(f".{image_type}",
+                                                                f"_{convert_style.replace(' ', '_').replace('/', '_')}.jpg")
+
+                        if not os.path.exists(f"{output_image_folder_path}/{convert_image_name}"):
+                            txt_f = tar.extractfile(image_name.replace('.jpg', '.txt'))
+                            caption = txt_f.read().decode("utf-8")
+                            edit_prompt = ",".join([caption, convert_style])
+                            source_image_path, target_image_path = edit.gen_edit_image("change_style", edit_prompt,
+                                                                                       image, image_name,
+                                                                                       convert_image_name)
+
+                            json_line = {"source_image": source_image_path, "target_image": target_image_path,
+                                         "style": convert_style}
+                            self.append2jsonl(json_line)
+                except Exception as e:
+                    print(f"error: {str(e)}")
 
     def append2jsonl(self, json_line):
         with open(f"{output_jsonl_folder_path}/convert-style-images.jsonl", mode="a+", encoding="utf-8") as a:

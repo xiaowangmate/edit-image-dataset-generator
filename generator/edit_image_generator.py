@@ -149,7 +149,7 @@ class EditImageGenerator:
             "denoising_strength": 1,
             "cfg_scale": 10,
             "steps": 48,
-            "sampler_index": "DPM++ 2M Karras",
+            "sampler_index": "DPM++ 2M SDE Heun Karras",
             "alwayson_scripts": {
                 "controlnet": {
                     "args": [

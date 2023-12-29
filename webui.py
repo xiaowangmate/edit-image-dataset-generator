@@ -1,8 +1,10 @@
 import json
 import base64
 import gradio as gr
+from PIL import Image
 from predictor.sam_predictor import SAMPredictor
 from generator.edit_image_generator import EditImageGenerator
+from generator.image_object_replacer import ImageObjectReplacer
 
 with open("configs/config.json", mode="r", encoding="utf-8") as r:
     config = json.loads(r.read())
@@ -12,6 +14,7 @@ with open("configs/config.json", mode="r", encoding="utf-8") as r:
 
 predictor = SAMPredictor(host=host, port=port)
 edit = EditImageGenerator(host=host, port=port, output_folder_path=output_image_folder_path)
+replacer = ImageObjectReplacer(output_image_folder_path)
 
 
 def image2base64(image_path):
@@ -46,6 +49,10 @@ def oneclick_generation(image, mask_prompt, expand, task, edit_prompt):
         source_image_path, target_image_path = edit.gen_edit_image(task, edit_prompt,
                                                                    image, input_image_name)
         return [target_image_path]
+    elif task == "replace_object":
+        predictor.gen_mask(mask_prompt, image, expand)
+        target_image_path = replacer.replace_object(Image.open(image), Image.open("output/mask/sam_mask.png"), edit_prompt)
+        return [target_image_path, "output/mask/sam_mask.png"]
     else:
         predictor.gen_mask(mask_prompt, image, expand)
         source_image_path, target_image_path = edit.gen_edit_image(task, edit_prompt,
@@ -86,6 +93,7 @@ def start_ui():
                     label="edit image",
                     allow_preview=True,
                     preview=True,
+                    object_fit="contain",
                     selected_index=0
                 )
 
